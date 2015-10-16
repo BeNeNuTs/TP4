@@ -1,4 +1,6 @@
-#include "trianglewindow.h"
+#include "gamewindow.h"
+#include "camera.h"
+#include "mytcpserver.h"
 
 #include <QtGui/QGuiApplication>
 #include <QtGui/QMatrix4x4>
@@ -15,45 +17,54 @@
 #include <QtCore>
 #include <QtGui>
 
-//#include <omp.h>
-
 using namespace std;
-
 
 int main(int argc, char **argv)
 {
     srand(time(NULL));
     QGuiApplication app(argc, argv);
-    
+
     QSurfaceFormat format;
     format.setSamples(16);
-    
-    paramCamera* c=new paramCamera();
-    
-    QTimer* calendar = new QTimer;
 
-    TriangleWindow* window[4];
-    for(int i = 0; i < 4; i++)
-    {
-        if (i == 0)
-            window[i] = new TriangleWindow();
-        else
-            window[i] = new TriangleWindow(30);
-        window[i]->setSeason(i);
-        window[i]->c = c;
-        window[i]->setFormat(format);
-        window[i]->resize(500,375);
-        int x = i%2;
-        int y = i>>1;
-                
-        window[i]->setPosition(x*500,y*450);
-        window[i]->show();
+    FileManager::Instance().loadCustomMap("./game.txt");
 
-        calendar->connect(calendar, SIGNAL(timeout()),window[i], SLOT(updateSeason()));
-    }
-    
-    calendar->start(20);
+    MyTcpServer* tcpServer = new MyTcpServer();
+    tcpServer->start(10000);
+
+    Camera* cam = new Camera();
+
+    GameWindow window0(120,cam);
+    window0.setFormat(format);
+    window0.resize(500,375);
+    window0.setPosition(0,0);
+    window0.show();
+
+    GameWindow window1(60,cam);
+    window1.setFormat(format);
+    window1.resize(500,375);
+    window1.setPosition(800,50);
+    window1.show();
+
+    GameWindow window2(30,cam);
+    window2.setFormat(format);
+    window2.resize(500,375);
+    window2.setPosition(50,400);
+    window2.show();
+
+    GameWindow window3(1,cam);
+    window3.setFormat(format);
+    window3.resize(500,375);
+    window3.setPosition(800,400);
+    window3.show();
+
+    window0.setAnimating(true);
+    window1.setAnimating(true);
+    window2.setAnimating(true);
+    window3.setAnimating(true);
 
     return app.exec();
 }
+
+
 

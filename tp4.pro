@@ -1,18 +1,29 @@
-QMAKE_MAC_SDK = macosx10.11
-
-QMAKE_CXXFLAGS += -stdlib=libc++ -std=c++11
-
-INCLUDEPATH += /opt/local/include
-LIBS += -stdlib=libc++
-
+INCLUDEPATH += $$PWD
 SOURCES += $$PWD/openglwindow.cpp \
-    main.cpp \
-    trianglewindow.cpp
+    gamewindow.cpp \
+    camera.cpp \
+    mytcpserver.cpp \
+    filemanager.cpp \
+    terrain.cpp
 HEADERS += $$PWD/openglwindow.h \
-    trianglewindow.h
+    gamewindow.h \
+    camera.h \
+    mytcpserver.h \
+    filemanager.h \
+    terrain.h \
+    commonstruct.h
+
+SOURCES += \
+    main.cpp
 
 target.path = .
-
 INSTALLS += target
 
-RESOURCES += gestionnaire.qrc
+RESOURCES += \
+    gestionnaire.qrc
+
+QT += network
+
+QMAKE_CXXFLAGS += -fopenmp -std=c++11
+LIBS += -fopenmp -std=c++11
+
