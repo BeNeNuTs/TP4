@@ -34,25 +34,25 @@ int main(int argc, char **argv)
 
     Camera* cam = new Camera();
 
-    GameWindow window0(120,cam);
+    GameWindow window0(40,cam);
     window0.setFormat(format);
     window0.resize(500,375);
     window0.setPosition(0,0);
     window0.show();
 
-    GameWindow window1(60,cam);
+    GameWindow window1(40,cam);
     window1.setFormat(format);
     window1.resize(500,375);
     window1.setPosition(800,50);
     window1.show();
 
-    GameWindow window2(30,cam);
+    GameWindow window2(40,cam);
     window2.setFormat(format);
     window2.resize(500,375);
     window2.setPosition(50,400);
     window2.show();
 
-    GameWindow window3(1,cam);
+    GameWindow window3(40,cam);
     window3.setFormat(format);
     window3.resize(500,375);
     window3.setPosition(800,400);

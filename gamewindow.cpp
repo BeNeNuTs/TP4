@@ -43,10 +43,10 @@ GameWindow::GameWindow(int refresh_rate, Camera* c) : carte(1), m_refresh_rate(r
     nb_vertex_width = nb_vertex_height = 0;
 
     tree = new GameObject*[FileManager::NB_TERRAIN];
-    tree[0] = new GameObject(QVector3D(0.f,0.f,0.f), QVector3D(0.f,0.f,0.f), QVector3D(1.f,1.f,1.f), ":/springtree.ply");
-    tree[1] = new GameObject(QVector3D(0.f,0.f,0.f), QVector3D(0.f,0.f,0.f), QVector3D(1.f,1.f,1.f), ":/autumntree.ply");
-    tree[2] = new GameObject(QVector3D(0.f,0.f,0.f), QVector3D(0.f,0.f,0.f), QVector3D(1.f,1.f,1.f), ":/summertree.ply");
-    tree[3] = new GameObject(QVector3D(0.f,0.f,0.f), QVector3D(0.f,0.f,0.f), QVector3D(1.f,1.f,1.f), ":/wintertree.ply");
+    tree[0] = new GameObject(QVector3D(0.f,0.f,0.f), QVector3D(0.f,0.f,0.f), QVector3D(0.1f,0.1f,0.1f), ":/springtree.ply");
+    tree[1] = new GameObject(QVector3D(0.f,0.f,0.f), QVector3D(0.f,0.f,0.f), QVector3D(0.1f,0.1f,0.1f), ":/autumntree.ply");
+    tree[2] = new GameObject(QVector3D(0.f,0.f,0.f), QVector3D(0.f,0.f,0.f), QVector3D(0.1f,0.1f,0.1f), ":/summertree.ply");
+    tree[3] = new GameObject(QVector3D(0.f,0.f,0.f), QVector3D(0.f,0.f,0.f), QVector3D(0.1f,0.1f,0.1f), ":/wintertree.ply");
 
     m_timer = new QTimer(this);
     connect(m_timer,SIGNAL(timeout()),this, SLOT(renderNow()));
@@ -81,6 +81,25 @@ void GameWindow::initialize()
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(-1.0, 1.0, -1.0, 1.0, -100.0, 100.0);
+
+    glEnable(GL_DEPTH_TEST);    // Active le Z-Buffer
+    glShadeModel(GL_SMOOTH);
+
+    glEnable(GL_COLOR_MATERIAL);
+    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+
+    //Add ambient light
+    GLfloat ambientColor[] = {0.8f, 0.8f, 0.8f, 1.0f}; //Color(0.2, 0.2, 0.2)
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientColor);
+
+    //Add directionnal light
+    GLfloat lightColor0[] = {1.f, 1.f, 1.f, 1.0f};
+    GLfloat lightPos0[] = {-1.0f, 0.5f, 0.5f, 0.0f};
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor0);
+    glLightfv(GL_LIGHT0, GL_POSITION, lightPos0);
+
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
 
     Terrain* T = FileManager::Instance().getTerrain();
     if(T->nb_vertex_width != 0)
@@ -140,7 +159,7 @@ void GameWindow::loadMap(QString localPath)
 void GameWindow::render()
 {
 
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glLoadIdentity();
     glScalef(m_camera->ss,m_camera->ss,m_camera->ss);
@@ -275,7 +294,7 @@ void GameWindow::displayPoints()
 
     uint id = 0;
 
-    #pragma omp for schedule(dynamic)
+#pragma omp for schedule(dynamic)
     for(int i = 0; i < nb_vertex_width; i++)
     {
 
@@ -301,7 +320,7 @@ void GameWindow::displayTriangles()
     glBegin(GL_TRIANGLES);
     uint id = 0;
 
-    #pragma omp for schedule(dynamic)
+#pragma omp for schedule(dynamic)
     for(int i = 0; i < nb_vertex_width-1; i++)
     {
         for(int j = 0; j < nb_vertex_height-1; j++)
@@ -355,7 +374,7 @@ void GameWindow::displayTrianglesC()
     glBegin(GL_TRIANGLES);
     uint id = 0;
 
-    #pragma omp for schedule(dynamic)
+#pragma omp for schedule(dynamic)
     for(int i = 0; i < nb_vertex_width-1; i++)
     {
         for(int j = 0; j < nb_vertex_height-1; j++)
@@ -408,7 +427,7 @@ void GameWindow::displayLines()
     glBegin(GL_LINES);
     uint id = 0;
 
-    #pragma omp for schedule(dynamic)
+#pragma omp for schedule(dynamic)
     for(int i = 0; i < nb_vertex_width-1; i++)
     {
         for(int j = 0; j < nb_vertex_height-1; j++)
@@ -484,7 +503,7 @@ void GameWindow::displayTrianglesTexture()
     glBegin(GL_TRIANGLES);
     uint id = 0;
 
-    #pragma omp for schedule(dynamic)
+#pragma omp for schedule(dynamic)
     for(int i = 0; i < nb_vertex_width-1; i++)
     {
         for(int j = 0; j < nb_vertex_height-1; j++)
@@ -615,7 +634,7 @@ color GameWindow::seasonColor(){
 void GameWindow::createParticles(){
     tab_particles = new particles[MAX_PARTICLES];
 
-    #pragma omp parallel for
+#pragma omp parallel for
     for(unsigned int i = 0 ; i < MAX_PARTICLES ; i++){
         tab_particles[i] = newParticle();
     }
@@ -656,7 +675,7 @@ void GameWindow::displayParticles(){
 
     glBegin(GL_POINTS);
 
-    #pragma omp for schedule(dynamic)
+#pragma omp for schedule(dynamic)
     for(unsigned int i = 0 ; i < MAX_PARTICLES ; i++){
         glVertex3f(tab_particles[i].x, tab_particles[i].y, tab_particles[i].z);
 

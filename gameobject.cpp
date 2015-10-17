@@ -14,6 +14,9 @@ GameObject::GameObject()
     nb_vertex = 0;
     vertex = new QVector3D[nb_vertex];
     normals = new QVector3D[nb_vertex];
+
+    nb_ind = 0;
+    index = new QVector3D[nb_ind];
 }
 
 GameObject::GameObject(QVector3D pos, QVector3D rot, QVector3D _scale)
@@ -25,6 +28,9 @@ GameObject::GameObject(QVector3D pos, QVector3D rot, QVector3D _scale)
     nb_vertex = 0;
     vertex = new QVector3D[nb_vertex];
     normals = new QVector3D[nb_vertex];
+
+    nb_ind = 0;
+    index = new QVector3D[nb_ind];
 }
 
 GameObject::GameObject(QVector3D pos, QVector3D rot, QVector3D _scale, QString _localPath)
@@ -60,13 +66,22 @@ void GameObject::display()
     glTranslatef(position.x(), position.y(), position.z());
     glScalef(scale.x(), scale.y(), scale.z());
     glRotatef(rotation.x(), 1.f, 0.f, 0.f);
-    glRotatef(rotation.y(), 0.f, 1.f, 0.f);
-    glRotatef(rotation.z(), 0.f, 0.f, 1.f);
+    glRotatef(rotation.y(), 0.f, 0.f, 1.f);
+    glRotatef(rotation.z(), 0.f, 1.f, 0.f);
 
-    glBegin(GL_POINTS);
-    glColor3f(1.f,0.f,0.f);
-    for(int i = 0 ; i < nb_vertex ; i++){
-        glVertex3f(vertex[i].x(), vertex[i].y(), vertex[i].z());
+    glColor3f(0.f,0.5f,0.f);
+
+    glBegin(GL_TRIANGLES);
+    for(int i = 0 ; i < nb_ind ; i++){
+        glNormal3f(normals[(int)index[i].x()].x(), normals[(int)index[i].x()].y(), normals[(int)index[i].x()].z());
+        glVertex3f(vertex[(int)index[i].x()].x(), vertex[(int)index[i].x()].y(), vertex[(int)index[i].x()].z());
+
+        glNormal3f(normals[(int)index[i].y()].x(), normals[(int)index[i].y()].y(), normals[(int)index[i].y()].z());
+        glVertex3f(vertex[(int)index[i].y()].x(), vertex[(int)index[i].y()].y(), vertex[(int)index[i].y()].z());
+
+        glNormal3f(normals[(int)index[i].z()].x(), normals[(int)index[i].z()].y(), normals[(int)index[i].z()].z());
+        glVertex3f(vertex[(int)index[i].z()].x(), vertex[(int)index[i].z()].y(), vertex[(int)index[i].z()].z());
+
     }
     glEnd();
 
@@ -90,7 +105,7 @@ void GameObject::openPLY(QString _localPath)
     // extract words
     QStringList lines = content.split("\n");
 
-    int index = 0;
+    int ind = 0;
 
     for(int i = 0 ; i < lines.size() ; i++){
         if(lines[i].contains("element vertex")){
@@ -102,16 +117,18 @@ void GameObject::openPLY(QString _localPath)
         }
 
         if(lines[i].contains("end_header")){
-            index = i+1;
+            ind = i+1;
             break;
         }
     }
 
     vertex = new QVector3D[nb_vertex];
     normals = new QVector3D[nb_vertex];
+    index = new QVector3D[nb_ind];
+
     int i = 0;
     while(i < nb_vertex){
-        QStringList words = lines[index + i].split(" ");
+        QStringList words = lines[ind + i].split(" ");
 
         vertex[i].setX(words[0].toFloat());
         vertex[i].setY(words[1].toFloat());
@@ -123,5 +140,18 @@ void GameObject::openPLY(QString _localPath)
 
         i++;
     }
+
+    ind += i;
+    i = 0;
+    while(i < nb_ind){
+        QStringList words = lines[ind + i].split(" ");
+
+        index[i].setX(words[1].toInt());
+        index[i].setY(words[2].toInt());
+        index[i].setZ(words[3].toInt());
+
+        i++;
+    }
+
 }
 

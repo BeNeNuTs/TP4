@@ -33,6 +33,7 @@ public:
     int nb_vertex;
     QVector3D* normals;
 
+    QVector3D* index;
     int nb_ind;
 
 signals:
