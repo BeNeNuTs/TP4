@@ -68,6 +68,8 @@ private:
     int m_frame;
     QImage m_image;
     point *p;
+    int nb_vertex_width;
+    int nb_vertex_height;
 
 
     int carte;

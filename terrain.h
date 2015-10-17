@@ -10,14 +10,15 @@ class Terrain
 {
 public:
     Terrain();
-    Terrain(QString season, color c, int nb_v, point* p);
-    Terrain(QString season, color c, int nb_v, QVector3D* v);
+    Terrain(QString season, color c, int nb_v_w, int nb_v_h, point* p);
+    Terrain(QString season, color c, int nb_v_w, int nb_v_h, QVector3D* v);
 
 public:
     QString saison;
     color c;
 
-    int nb_vertex;
+    int nb_vertex_width;
+    int nb_vertex_height;
     QVector3D* vertex;
 
 

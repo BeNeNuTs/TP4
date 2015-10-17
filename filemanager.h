@@ -13,9 +13,11 @@ public:
     void saveCustomMap(QString localPath, Terrain* T);
     void loadCustomMap(QString localPath);
 
-    Terrain* getTerrain() const;
+    Terrain* getTerrain();
 
 private:
+    static const int NB_TERRAIN = 4;
+
     static FileManager m_instance;
     static int id;
     FileManager();

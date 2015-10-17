@@ -40,6 +40,7 @@ GameWindow::GameWindow(int refresh_rate, Camera* c) : carte(1), m_refresh_rate(r
     }
 
     season = "NONE";
+    nb_vertex_width = nb_vertex_height = 0;
 
     m_timer = new QTimer(this);
     connect(m_timer,SIGNAL(timeout()),this, SLOT(renderNow()));
@@ -76,18 +77,21 @@ void GameWindow::initialize()
     glLoadIdentity();
     glOrtho(-1.0, 1.0, -1.0, 1.0, -100.0, 100.0);
 
-    //loadMap(":/heightmap-2.png");
     Terrain* T = FileManager::Instance().getTerrain();
-    if(T->nb_vertex != 0)
+    if(T->nb_vertex_width != 0)
     {
         season = T->saison;
-        p = new point[T->nb_vertex];
-        for(int i = 0 ; i < T->nb_vertex ; i++)
+        nb_vertex_width = T->nb_vertex_width;
+        nb_vertex_height = T->nb_vertex_height;
+        p = new point[nb_vertex_width * nb_vertex_height];
+        for(int i = 0 ; i < nb_vertex_width * nb_vertex_height ; i++)
         {
             p[i].x = T->vertex[i].x();
             p[i].y = T->vertex[i].y();
             p[i].z = T->vertex[i].z();
         }
+    }else{
+        loadMap(":/heightmap-2.png");
     }
 
     createParticles();
@@ -105,19 +109,21 @@ void GameWindow::loadMap(QString localPath)
     }
 
     uint id = 0;
-    p = new point[m_image.width() * m_image.height()];
+    nb_vertex_width = m_image.width();
+    nb_vertex_height = m_image.height();
+    p = new point[nb_vertex_width * nb_vertex_height];
     QRgb pixel;
-    for(int i = 0; i < m_image.width(); i++)
+    for(int i = 0; i < nb_vertex_width; i++)
     {
-        for(int j = 0; j < m_image.height(); j++)
+        for(int j = 0; j < nb_vertex_height; j++)
         {
 
             pixel = m_image.pixel(i,j);
 
-            id = i*m_image.width() +j;
+            id = i*nb_vertex_width +j;
 
-            p[id].x = (float)i/(m_image.width()) - ((float)m_image.width()/2.0)/m_image.width();
-            p[id].y = (float)j/(m_image.height()) - ((float)m_image.height()/2.0)/m_image.height();
+            p[id].x = (float)i/(nb_vertex_width) - ((float)nb_vertex_width/2.0)/nb_vertex_width;
+            p[id].y = (float)j/(nb_vertex_width) - ((float)nb_vertex_height/2.0)/nb_vertex_height;
             p[id].z = 0.001f * (float)(qRed(pixel));
         }
     }
@@ -264,12 +270,12 @@ void GameWindow::displayPoints()
     uint id = 0;
 
     #pragma omp for schedule(dynamic)
-    for(int i = 0; i < m_image.width(); i++)
+    for(int i = 0; i < nb_vertex_width; i++)
     {
 
-        for(int j = 0; j < m_image.height(); j++)
+        for(int j = 0; j < nb_vertex_height; j++)
         {
-            id = i*m_image.width() +j;
+            id = i*nb_vertex_width +j;
             glVertex3f(
                         p[id].x,
                         p[id].y,
@@ -290,22 +296,22 @@ void GameWindow::displayTriangles()
     uint id = 0;
 
     #pragma omp for schedule(dynamic)
-    for(int i = 0; i < m_image.width()-1; i++)
+    for(int i = 0; i < nb_vertex_width-1; i++)
     {
-        for(int j = 0; j < m_image.height()-1; j++)
+        for(int j = 0; j < nb_vertex_height-1; j++)
         {
 
-            id = i*m_image.width() +j;
+            id = i*nb_vertex_width +j;
             glVertex3f(
                         p[id].x,
                         p[id].y,
                         p[id].z);
-            id = i*m_image.width() +(j+1);
+            id = i*nb_vertex_width +(j+1);
             glVertex3f(
                         p[id].x,
                         p[id].y,
                         p[id].z);
-            id = (i+1)*m_image.width() +j;
+            id = (i+1)*nb_vertex_width +j;
             glVertex3f(
                         p[id].x,
                         p[id].y,
@@ -313,17 +319,17 @@ void GameWindow::displayTriangles()
 
 
 
-            id = i*m_image.width() +(j+1);
+            id = i*nb_vertex_width +(j+1);
             glVertex3f(
                         p[id].x,
                         p[id].y,
                         p[id].z);
-            id = (i+1)*m_image.width() +j+1;
+            id = (i+1)*nb_vertex_width +j+1;
             glVertex3f(
                         p[id].x,
                         p[id].y,
                         p[id].z);
-            id = (i+1)*m_image.width() +j;
+            id = (i+1)*nb_vertex_width +j;
             glVertex3f(
                         p[id].x,
                         p[id].y,
@@ -344,22 +350,22 @@ void GameWindow::displayTrianglesC()
     uint id = 0;
 
     #pragma omp for schedule(dynamic)
-    for(int i = 0; i < m_image.width()-1; i++)
+    for(int i = 0; i < nb_vertex_width-1; i++)
     {
-        for(int j = 0; j < m_image.height()-1; j++)
+        for(int j = 0; j < nb_vertex_height-1; j++)
         {
             glColor3f(0.0f, 1.0f, 0.0f);
-            id = i*m_image.width() +j;
+            id = i*nb_vertex_width +j;
             glVertex3f(
                         p[id].x,
                         p[id].y,
                         p[id].z);
-            id = i*m_image.width() +(j+1);
+            id = i*nb_vertex_width +(j+1);
             glVertex3f(
                         p[id].x,
                         p[id].y,
                         p[id].z);
-            id = (i+1)*m_image.width() +j;
+            id = (i+1)*nb_vertex_width +j;
             glVertex3f(
                         p[id].x,
                         p[id].y,
@@ -367,17 +373,17 @@ void GameWindow::displayTrianglesC()
 
 
             glColor3f(1.0f, 1.0f, 1.0f);
-            id = i*m_image.width() +(j+1);
+            id = i*nb_vertex_width +(j+1);
             glVertex3f(
                         p[id].x,
                         p[id].y,
                         p[id].z);
-            id = (i+1)*m_image.width() +j+1;
+            id = (i+1)*nb_vertex_width +j+1;
             glVertex3f(
                         p[id].x,
                         p[id].y,
                         p[id].z);
-            id = (i+1)*m_image.width() +j;
+            id = (i+1)*nb_vertex_width +j;
             glVertex3f(
                         p[id].x,
                         p[id].y,
@@ -397,62 +403,62 @@ void GameWindow::displayLines()
     uint id = 0;
 
     #pragma omp for schedule(dynamic)
-    for(int i = 0; i < m_image.width()-1; i++)
+    for(int i = 0; i < nb_vertex_width-1; i++)
     {
-        for(int j = 0; j < m_image.height()-1; j++)
+        for(int j = 0; j < nb_vertex_height-1; j++)
         {
 
-            id = i*m_image.width() +j;
+            id = i*nb_vertex_width +j;
             glVertex3f(
                         p[id].x,
                         p[id].y,
                         p[id].z);
-            id = i*m_image.width() +(j+1);
-            glVertex3f(
-                        p[id].x,
-                        p[id].y,
-                        p[id].z);
-
-            id = (i+1)*m_image.width() +j;
-            glVertex3f(
-                        p[id].x,
-                        p[id].y,
-                        p[id].z);
-            id = i*m_image.width() +j;
+            id = i*nb_vertex_width +(j+1);
             glVertex3f(
                         p[id].x,
                         p[id].y,
                         p[id].z);
 
-            id = (i+1)*m_image.width() +j;
+            id = (i+1)*nb_vertex_width +j;
             glVertex3f(
                         p[id].x,
                         p[id].y,
                         p[id].z);
-            id = i*m_image.width() +(j+1);
-            glVertex3f(
-                        p[id].x,
-                        p[id].y,
-                        p[id].z);
-
-            id = i*m_image.width() +(j+1);
-            glVertex3f(
-                        p[id].x,
-                        p[id].y,
-                        p[id].z);
-            id = (i+1)*m_image.width() +j+1;
+            id = i*nb_vertex_width +j;
             glVertex3f(
                         p[id].x,
                         p[id].y,
                         p[id].z);
 
-            id = (i+1)*m_image.width() +j+1;
+            id = (i+1)*nb_vertex_width +j;
+            glVertex3f(
+                        p[id].x,
+                        p[id].y,
+                        p[id].z);
+            id = i*nb_vertex_width +(j+1);
             glVertex3f(
                         p[id].x,
                         p[id].y,
                         p[id].z);
 
-            id = (i+1)*m_image.width() +(j);
+            id = i*nb_vertex_width +(j+1);
+            glVertex3f(
+                        p[id].x,
+                        p[id].y,
+                        p[id].z);
+            id = (i+1)*nb_vertex_width +j+1;
+            glVertex3f(
+                        p[id].x,
+                        p[id].y,
+                        p[id].z);
+
+            id = (i+1)*nb_vertex_width +j+1;
+            glVertex3f(
+                        p[id].x,
+                        p[id].y,
+                        p[id].z);
+
+            id = (i+1)*nb_vertex_width +(j);
             glVertex3f(
                         p[id].x,
                         p[id].y,
@@ -473,24 +479,24 @@ void GameWindow::displayTrianglesTexture()
     uint id = 0;
 
     #pragma omp for schedule(dynamic)
-    for(int i = 0; i < m_image.width()-1; i++)
+    for(int i = 0; i < nb_vertex_width-1; i++)
     {
-        for(int j = 0; j < m_image.height()-1; j++)
+        for(int j = 0; j < nb_vertex_height-1; j++)
         {
 
-            id = i*m_image.width() +j;
+            id = i*nb_vertex_width +j;
             displayColor(p[id].z);
             glVertex3f(
                         p[id].x,
                         p[id].y,
                         p[id].z);
-            id = i*m_image.width() +(j+1);
+            id = i*nb_vertex_width +(j+1);
             displayColor(p[id].z);
             glVertex3f(
                         p[id].x,
                         p[id].y,
                         p[id].z);
-            id = (i+1)*m_image.width() +j;
+            id = (i+1)*nb_vertex_width +j;
             displayColor(p[id].z);
             glVertex3f(
                         p[id].x,
@@ -499,19 +505,19 @@ void GameWindow::displayTrianglesTexture()
 
 
 
-            id = i*m_image.width() +(j+1);
+            id = i*nb_vertex_width +(j+1);
             displayColor(p[id].z);
             glVertex3f(
                         p[id].x,
                         p[id].y,
                         p[id].z);
-            id = (i+1)*m_image.width() +j+1;
+            id = (i+1)*nb_vertex_width +j+1;
             displayColor(p[id].z);
             glVertex3f(
                         p[id].x,
                         p[id].y,
                         p[id].z);
-            id = (i+1)*m_image.width() +j;
+            id = (i+1)*nb_vertex_width +j;
             displayColor(p[id].z);
             glVertex3f(
                         p[id].x,
@@ -617,9 +623,9 @@ particles GameWindow::newParticle(){
     particles part;
     int rand_x, rand_y, id;
 
-    rand_x = rand() % m_image.width();
-    rand_y = rand() % m_image.height();
-    id = rand_y * m_image.width() + rand_x;
+    rand_x = rand() % nb_vertex_width;
+    rand_y = rand() % nb_vertex_height;
+    id = rand_y * nb_vertex_width + rand_x;
 
     part.x = p[id].x;
     part.y = p[id].y;
@@ -681,7 +687,7 @@ void GameWindow::doConnect(){
 }
 
 void GameWindow::save(){
-    Terrain* T = new Terrain(season, seasonColor(), m_image.width() * m_image.height(), p);
+    Terrain* T = new Terrain(season, seasonColor(), nb_vertex_width, nb_vertex_height, p);
     FileManager::Instance().saveCustomMap("./game.txt", T);
 }
 
