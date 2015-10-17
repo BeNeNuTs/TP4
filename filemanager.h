@@ -14,10 +14,10 @@ public:
     void loadCustomMap(QString localPath);
 
     Terrain* getTerrain();
-
-private:
+public:
     static const int NB_TERRAIN = 4;
 
+private:
     static FileManager m_instance;
     static int id;
     FileManager();

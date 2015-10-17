@@ -27,7 +27,7 @@ void MyTcpServer::start(int timeBetweenSeason){
         timer->start(timeBetweenSeason);
 
         saveTimer = new QTimer(this);
-        connect(saveTimer,SIGNAL(timeout()),this, SLOT(saveGame()));
+        //connect(saveTimer,SIGNAL(timeout()),this, SLOT(saveGame()));
         saveTimer->start(timeBetweenSeason + 1000);
     }
 }

@@ -27,7 +27,7 @@ int main(int argc, char **argv)
     QSurfaceFormat format;
     format.setSamples(16);
 
-    FileManager::Instance().loadCustomMap("./game.txt");
+    FileManager::Instance().loadCustomMap(":/game.txt");
 
     MyTcpServer* tcpServer = new MyTcpServer();
     tcpServer->start(10000);

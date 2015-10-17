@@ -42,11 +42,16 @@ GameWindow::GameWindow(int refresh_rate, Camera* c) : carte(1), m_refresh_rate(r
     season = "NONE";
     nb_vertex_width = nb_vertex_height = 0;
 
+    tree = new GameObject*[FileManager::NB_TERRAIN];
+    tree[0] = new GameObject(QVector3D(0.f,0.f,0.f), QVector3D(0.f,0.f,0.f), QVector3D(1.f,1.f,1.f), ":/springtree.ply");
+    tree[1] = new GameObject(QVector3D(0.f,0.f,0.f), QVector3D(0.f,0.f,0.f), QVector3D(1.f,1.f,1.f), ":/autumntree.ply");
+    tree[2] = new GameObject(QVector3D(0.f,0.f,0.f), QVector3D(0.f,0.f,0.f), QVector3D(1.f,1.f,1.f), ":/summertree.ply");
+    tree[3] = new GameObject(QVector3D(0.f,0.f,0.f), QVector3D(0.f,0.f,0.f), QVector3D(1.f,1.f,1.f), ":/wintertree.ply");
+
     m_timer = new QTimer(this);
     connect(m_timer,SIGNAL(timeout()),this, SLOT(renderNow()));
 
     restartTimer();
-
     doConnect();
 }
 
@@ -170,6 +175,7 @@ void GameWindow::render()
     }
 
     displayParticles();
+    displayTree();
 
     if(animate){
         animWindow();
@@ -663,6 +669,24 @@ void GameWindow::displayParticles(){
     glEnd();
 }
 
+void GameWindow::displayTree(){
+    int id = 0;
+
+    if(season == "PRINTEMPS"){
+        id = 0;
+    }else if(season == "ETE"){
+        id = 1;
+    }else if(season == "AUTOMNE"){
+        id = 2;
+    }else if(season == "HIVER"){
+        id = 3;
+    }else{
+        return;
+    }
+
+    tree[id]->display();
+}
+
 /**
  * @brief GameWindow::doConnect, Connecte le client au serveur.
  */
@@ -688,7 +712,7 @@ void GameWindow::doConnect(){
 
 void GameWindow::save(){
     Terrain* T = new Terrain(season, seasonColor(), nb_vertex_width, nb_vertex_height, p);
-    FileManager::Instance().saveCustomMap("./game.txt", T);
+    FileManager::Instance().saveCustomMap(":/game.txt", T);
 }
 
 /** SLOTS **/

@@ -5,6 +5,7 @@
 #include "camera.h"
 #include "filemanager.h"
 #include "commonstruct.h"
+#include "gameobject.h"
 
 #include <QTcpSocket>
 #include <QAbstractSocket>
@@ -56,6 +57,8 @@ public:
     particles newParticle();
     void displayParticles();
 
+    void displayTree();
+
     void doConnect();
 
     void save();
@@ -71,7 +74,6 @@ private:
     int nb_vertex_width;
     int nb_vertex_height;
 
-
     int carte;
     int m_refresh_rate; 		// Taux de rafraîchissement de la fenêtre.
 
@@ -86,6 +88,8 @@ private:
     QTcpSocket *socket;         // QTcpSocket permettant de se connecter au serveur
 
     particles* tab_particles;   // Tableau contenant les particules de pluie/neige
+
+    GameObject** tree;
 };
 
 

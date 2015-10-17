@@ -4,14 +4,16 @@ SOURCES += $$PWD/openglwindow.cpp \
     camera.cpp \
     mytcpserver.cpp \
     filemanager.cpp \
-    terrain.cpp
+    terrain.cpp \
+    gameobject.cpp
 HEADERS += $$PWD/openglwindow.h \
     gamewindow.h \
     camera.h \
     mytcpserver.h \
     filemanager.h \
     terrain.h \
-    commonstruct.h
+    commonstruct.h \
+    gameobject.h
 
 SOURCES += \
     main.cpp
