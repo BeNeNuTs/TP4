@@ -8,5 +8,6 @@
         <file>heightmap-2.png</file>
         <file>heightmap-3.png</file>
         <file>game.txt</file>
+        <file>autumntree.stl</file>
     </qresource>
 </RCC>

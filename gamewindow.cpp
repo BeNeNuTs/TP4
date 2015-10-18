@@ -79,7 +79,7 @@ void GameWindow::initialize()
     glOrtho(-1.0, 1.0, -1.0, 1.0, -100.0, 100.0);
 
     glEnable(GL_DEPTH_TEST);    // Active le Z-Buffer
-    glShadeModel(GL_FLAT);
+    glShadeModel(GL_SMOOTH);
 
     glEnable(GL_COLOR_MATERIAL);
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
@@ -609,19 +609,19 @@ void GameWindow::updateTitle(){
  * @brief GameWindow::seasonColor, Affiche le terrain d'une couleur différente en fonction de la saison.
  */
 color GameWindow::seasonColor(){
-    if(season == "PRINTEMPS"){
+    if(saison == Saison::PRINTEMPS){
         glColor3f(0.f, 0.7f, 0.2f);
         return color{0.f, 0.7f, 0.2f};
     }
-    if(season == "ETE"){
+    else if(saison == Saison::ETE){
         glColor3f(1.f, 1.f, 0.f);
         return color{1.f, 1.f, 0.f};
     }
-    else if(season == "AUTOMNE"){
+    else if(saison == Saison::AUTOMNE){
         glColor3f(0.86f, 0.4f, 0.f);
         return color{0.86f, 0.4f, 0.f};
     }
-    else if(season == "HIVER"){
+    else if(saison == Saison::HIVER){
         glColor3f(0.8f, 0.8f, 0.8f);
         return color{0.8f, 0.8f, 0.8f};
     }
@@ -765,7 +765,7 @@ void GameWindow::initTrees()
             }else if(j == Saison::ETE){
                 tree[j][i] = new GameObject(pos, QVector3D(0.f,0.f,0.f), QVector3D(0.1f,0.1f,0.1f), ":/summertree.ply");
             }else if(j == Saison::AUTOMNE){
-                tree[j][i] = new GameObject(pos, QVector3D(0.f,0.f,0.f), QVector3D(0.1f,0.1f,0.1f), ":/autumntree.ply");
+                tree[j][i] = new GameObject(pos, QVector3D(0.f,0.f,0.f), QVector3D(0.1f,0.1f,0.1f), ":/autumntree.stl");
             }else if(j == Saison::HIVER){
                 tree[j][i] = new GameObject(pos, QVector3D(0.f,0.f,0.f), QVector3D(0.1f,0.1f,0.1f), ":/wintertree.ply");
             }

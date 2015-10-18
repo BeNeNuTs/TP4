@@ -56,12 +56,12 @@ void GameObject::open(QString _localPath)
         return;
     }
 
+    QString line = file.readLine();
 
-
-    if(file.readLine() == "ply\n"){
+    if(line.contains("ply")){
         file.close();
         openPLY(_localPath);
-    }else if(file.readLine() == "solid\n"){
+    }else if(line.contains("solid")){
         file.close();
         openSTL(_localPath);
     }
@@ -190,11 +190,15 @@ void GameObject::openSTL(QString _localPath)
         }
     }
 
-    vertex = new QVector3D[v_vertex.size()];
+    nb_vertex = v_vertex.size();
+
+    vertex = new QVector3D[nb_vertex];
     normals = new QVector3D[v_normals.size()];
 
     for(unsigned int i = 0 ; i < v_vertex.size() ; i++){
-        vertex[i] = v_vertex[i];
+        vertex[i].setX(v_vertex[i].x());
+        vertex[i].setY(v_vertex[i].y());
+        vertex[i].setZ(v_vertex[i].z());
     }
 
     for(unsigned int i = 0 ; i < v_normals.size() ; i++){
@@ -221,6 +225,16 @@ void GameObject::displayPLY()
 
 void GameObject::displaySTL()
 {
+    unsigned int j = 0;
 
+    glBegin(GL_TRIANGLES);
+    for(int i = 0 ; i < nb_vertex ; i+=3){
+        glNormal3f(normals[j].x(), normals[j].y(), normals[j].z());
+        glVertex3f(vertex[i].x(), vertex[i].y(), vertex[i].z());
+        glVertex3f(vertex[i+1].x(), vertex[i+1].y(), vertex[i+1].z());
+        glVertex3f(vertex[i+2].x(), vertex[i+2].y(), vertex[i+2].z());
+        j++;
+    }
+    glEnd();
 }
 
