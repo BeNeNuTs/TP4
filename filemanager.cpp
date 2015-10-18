@@ -5,6 +5,9 @@
 #include <QDebug>
 
 #include "filemanager.h"
+#include "gamewindow.h"
+#include "terrain.h"
+#include "camera.h"
 
 using namespace std;
 
@@ -17,6 +20,8 @@ FileManager::FileManager()
     for(int i = 0 ; i < NB_TERRAIN ; i++){
         T[i] = new Terrain();
     }
+
+    camera = nullptr;
     cout<<"Creation"<<endl;
 }
 
@@ -30,12 +35,12 @@ FileManager& FileManager::Instance()
     return m_instance;
 }
 
-void FileManager::saveCustomMap(QString localPath, Terrain* T)
+void FileManager::saveCustomMap(Terrain* T)
 {
     QFile file(localPath);
     if(!file.open(QIODevice::WriteOnly | QIODevice::Append))
     {
-        qDebug() << "Could not open " << localPath;
+        qDebug() << "FileManager : Could not open " << localPath;
         return;
     }
 
@@ -47,20 +52,28 @@ void FileManager::saveCustomMap(QString localPath, Terrain* T)
         out << T->vertex[i].x() << T->vertex[i].y() << T->vertex[i].z();
     }
 
+    out << T->tree->localPath;
+    out << T->tree->position.x() << T->tree->position.y() << T->tree->position.z();
+    out << T->tree->rotation.x() << T->tree->rotation.y() << T->tree->rotation.z();
+    out << T->tree->scale.x() << T->tree->scale.y() << T->tree->scale.z();
+
     file.flush();
     file.close();
 }
 
-void FileManager::loadCustomMap(QString localPath)
+void FileManager::loadCustomMap(QString _localPath)
 {
+    localPath = _localPath;
+
     QFile file(localPath);
     if(!file.open(QIODevice::ReadOnly))
     {
-        qDebug() << "Could not open " << localPath;
+        qDebug() << "FileManager : Could not open " << localPath;
         return;
     }
 
     if(file.size() == 0){
+        qDebug() << "FileManager : Empty file";
         file.close();
         return;
     }
@@ -73,6 +86,11 @@ void FileManager::loadCustomMap(QString localPath)
     int nb_vertex_w;
     int nb_vertex_h;
     QVector3D* vertex;
+
+    GameObject* tree;
+
+    camera = new Camera();
+    in >> camera->etat >> camera->rotX >> camera->rotY >> camera->ss;
 
     for(int t = 0 ; t < NB_TERRAIN ; t++){
 
@@ -88,15 +106,29 @@ void FileManager::loadCustomMap(QString localPath)
             vertex[i].setY(y);
             vertex[i].setZ(z);
         }
+        tree = new GameObject();
+        float x,y,z;
 
-        /*qDebug() << saison;
-        cout << nb_vertex << endl;
-        qDebug() << vertex[0].x() << " " << vertex[0].y() << " " << vertex[0].z();
-        qDebug() << vertex[nb_vertex-1].x() << " " << vertex[nb_vertex-1].y() << " " << vertex[nb_vertex-1].z();*/
+        in >> tree->localPath;
 
+        in >> x >> y >> z;
+        tree->position.setX(x);
+        tree->position.setY(y);
+        tree->position.setZ(z);
 
-        T[t] = new Terrain(saison, c, nb_vertex_w, nb_vertex_h, vertex);
+        in >> x >> y >> z;
+        tree->rotation.setX(x);
+        tree->rotation.setY(y);
+        tree->rotation.setZ(z);
+
+        in >> x >> y >> z;
+        tree->scale.setX(x);
+        tree->scale.setY(y);
+        tree->scale.setZ(z);
+
+        T[t] = new Terrain(saison, c, nb_vertex_w, nb_vertex_h, vertex, tree);
     }
+    file.flush();
     file.close();
 }
 

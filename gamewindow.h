@@ -2,7 +2,6 @@
 #define GAMEWINDOW_H
 
 #include "openglwindow.h"
-#include "camera.h"
 #include "filemanager.h"
 #include "commonstruct.h"
 #include "gameobject.h"
@@ -16,6 +15,8 @@ struct particles
     float falling_speed;
     float min_z;
 };
+
+enum Saison { PRINTEMPS = 0, ETE = 1, AUTOMNE = 2, HIVER = 3, NONE = 4};
 
 
 class GameWindow : public OpenGLWindow
@@ -63,6 +64,9 @@ public:
 
     void save();
 
+private:
+    updateEnumSaison();
+
 public:
     static const unsigned int MAX_PARTICLES = 1000;
 
@@ -85,6 +89,7 @@ private:
     float speed;				// Vitesse de rotation du terrain selon l'axe y quand animate = true.
 
     QString season;             // Contient le nom de la saison courante dans la fenêtre
+    Saison saison;
     QTcpSocket *socket;         // QTcpSocket permettant de se connecter au serveur
 
     particles* tab_particles;   // Tableau contenant les particules de pluie/neige

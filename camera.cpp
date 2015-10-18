@@ -2,9 +2,18 @@
 
 Camera::Camera()
 {
-    etat = 0;
-    rotX = -45.f;
-    rotY = -45.f;
-    ss = 1.f;
+    if(FileManager::Instance().camera != nullptr){
+        Camera* cam = FileManager::Instance().camera;
+        etat = cam->etat;
+        rotX = cam->rotX;
+        rotY = cam->rotY;
+        ss = cam->ss;
+    }else{
+        etat = 0;
+        rotX = -45.f;
+        rotY = -45.f;
+        ss = 1.f;
+    }
+
 }
 

@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>game.txt</file>
         <file>autumntree.ply</file>
         <file>springtree.ply</file>
         <file>summertree.ply</file>
@@ -8,5 +7,6 @@
         <file>heightmap-1.png</file>
         <file>heightmap-2.png</file>
         <file>heightmap-3.png</file>
+        <file>game.txt</file>
     </qresource>
 </RCC>

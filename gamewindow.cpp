@@ -1,5 +1,6 @@
 #include "gamewindow.h"
 #include "terrain.h"
+#include "camera.h"
 
 #include <QtGui/QGuiApplication>
 #include <QtGui/QMatrix4x4>
@@ -40,13 +41,8 @@ GameWindow::GameWindow(int refresh_rate, Camera* c) : carte(1), m_refresh_rate(r
     }
 
     season = "NONE";
+    saison = Saison::NONE;
     nb_vertex_width = nb_vertex_height = 0;
-
-    tree = new GameObject*[FileManager::NB_TERRAIN];
-    tree[0] = new GameObject(QVector3D(0.f,0.f,0.f), QVector3D(0.f,0.f,0.f), QVector3D(0.1f,0.1f,0.1f), ":/springtree.ply");
-    tree[1] = new GameObject(QVector3D(0.f,0.f,0.f), QVector3D(0.f,0.f,0.f), QVector3D(0.1f,0.1f,0.1f), ":/autumntree.ply");
-    tree[2] = new GameObject(QVector3D(0.f,0.f,0.f), QVector3D(0.f,0.f,0.f), QVector3D(0.1f,0.1f,0.1f), ":/summertree.ply");
-    tree[3] = new GameObject(QVector3D(0.f,0.f,0.f), QVector3D(0.f,0.f,0.f), QVector3D(0.1f,0.1f,0.1f), ":/wintertree.ply");
 
     m_timer = new QTimer(this);
     connect(m_timer,SIGNAL(timeout()),this, SLOT(renderNow()));
@@ -83,7 +79,7 @@ void GameWindow::initialize()
     glOrtho(-1.0, 1.0, -1.0, 1.0, -100.0, 100.0);
 
     glEnable(GL_DEPTH_TEST);    // Active le Z-Buffer
-    glShadeModel(GL_SMOOTH);
+    glShadeModel(GL_FLAT);
 
     glEnable(GL_COLOR_MATERIAL);
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
@@ -105,6 +101,7 @@ void GameWindow::initialize()
     if(T->nb_vertex_width != 0)
     {
         season = T->saison;
+        updateEnumSaison();
         nb_vertex_width = T->nb_vertex_width;
         nb_vertex_height = T->nb_vertex_height;
         p = new point[nb_vertex_width * nb_vertex_height];
@@ -114,7 +111,20 @@ void GameWindow::initialize()
             p[i].y = T->vertex[i].y();
             p[i].z = T->vertex[i].z();
         }
+
+        tree = new GameObject*[FileManager::NB_TERRAIN];
+        tree[Saison::PRINTEMPS] = new GameObject(T->tree->position, T->tree->rotation, T->tree->scale, ":/springtree.ply");
+        tree[Saison::ETE] = new GameObject(T->tree->position, T->tree->rotation, T->tree->scale, ":/summertree.ply");
+        tree[Saison::AUTOMNE] = new GameObject(T->tree->position, T->tree->rotation, T->tree->scale, ":/autumntree.ply");
+        tree[Saison::HIVER] = new GameObject(T->tree->position, T->tree->rotation, T->tree->scale, ":/wintertree.ply");
+
     }else{
+        tree = new GameObject*[FileManager::NB_TERRAIN];
+        tree[Saison::PRINTEMPS] = new GameObject(QVector3D(0.f,0.f,0.f), QVector3D(0.f,0.f,0.f), QVector3D(0.1f,0.1f,0.1f), ":/springtree.ply");
+        tree[Saison::ETE] = new GameObject(QVector3D(0.f,0.f,0.f), QVector3D(0.f,0.f,0.f), QVector3D(0.1f,0.1f,0.1f), ":/summertree.ply");
+        tree[Saison::AUTOMNE] = new GameObject(QVector3D(0.f,0.f,0.f), QVector3D(0.f,0.f,0.f), QVector3D(0.1f,0.1f,0.1f), ":/autumntree.ply");
+        tree[Saison::HIVER] = new GameObject(QVector3D(0.f,0.f,0.f), QVector3D(0.f,0.f,0.f), QVector3D(0.1f,0.1f,0.1f), ":/wintertree.ply");
+
         loadMap(":/heightmap-2.png");
     }
 
@@ -689,21 +699,11 @@ void GameWindow::displayParticles(){
 }
 
 void GameWindow::displayTree(){
-    int id = 0;
-
-    if(season == "PRINTEMPS"){
-        id = 0;
-    }else if(season == "ETE"){
-        id = 1;
-    }else if(season == "AUTOMNE"){
-        id = 2;
-    }else if(season == "HIVER"){
-        id = 3;
-    }else{
+    if(saison == Saison::NONE){
         return;
     }
 
-    tree[id]->display();
+    tree[saison]->display();
 }
 
 /**
@@ -730,8 +730,21 @@ void GameWindow::doConnect(){
 }
 
 void GameWindow::save(){
-    Terrain* T = new Terrain(season, seasonColor(), nb_vertex_width, nb_vertex_height, p);
-    FileManager::Instance().saveCustomMap(":/game.txt", T);
+    Terrain* T = new Terrain(season, seasonColor(), nb_vertex_width, nb_vertex_height, p, tree[saison]);
+    FileManager::Instance().saveCustomMap(T);
+}
+
+GameWindow::updateEnumSaison()
+{
+    if(season == "PRINTEMPS"){
+        saison = Saison::PRINTEMPS;
+    }else if(season == "ETE"){
+        saison = Saison::ETE;
+    }else if(season == "AUTOMNE"){
+        saison = Saison::AUTOMNE;
+    }else if(season == "HIVER"){
+        saison = Saison::HIVER;
+    }
 }
 
 /** SLOTS **/
@@ -763,6 +776,7 @@ void GameWindow::readyRead()
         save();
     }else{
         season = str;
+        updateEnumSaison();
         updateTitle();
     }
 }

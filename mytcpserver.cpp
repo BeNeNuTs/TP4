@@ -1,9 +1,9 @@
 #include "mytcpserver.h"
 
 #include <QFile>
+#include <QDataStream>
 
-MyTcpServer::MyTcpServer(QObject *parent) :
-    QObject(parent)
+MyTcpServer::MyTcpServer(Camera* cam) : camera(cam)
 {
     server = new QTcpServer(this);
 
@@ -27,7 +27,7 @@ void MyTcpServer::start(int timeBetweenSeason){
         timer->start(timeBetweenSeason);
 
         saveTimer = new QTimer(this);
-        //connect(saveTimer,SIGNAL(timeout()),this, SLOT(saveGame()));
+        connect(saveTimer,SIGNAL(timeout()),this, SLOT(saveGame()));
         saveTimer->start(timeBetweenSeason + 1000);
     }
 }
@@ -71,14 +71,22 @@ void MyTcpServer::saveGame()
 {
     qDebug() << "SAVE";
 
-    QString localPath = "./game.txt";
+    QString localPath = FileManager::Instance().localPath;
     QFile file(localPath);
     if(!file.open(QIODevice::ReadWrite))
     {
-        qDebug() << "Could not open " << localPath;
+        qDebug() << "MyTcpServer(saveGame) : Could not open " << localPath;
         return;
     }
     file.resize(0);
+
+    QDataStream out(&file);
+    out.setVersion(QDataStream::Qt_5_1);
+
+    out << camera->etat << camera->rotX << camera->rotY << camera->ss;
+
+    file.flush();
+    file.close();
 
     for(int i = 0 ; i < id ; i++){
         clients[i]->write("SAVE");

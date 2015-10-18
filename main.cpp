@@ -27,12 +27,12 @@ int main(int argc, char **argv)
     QSurfaceFormat format;
     format.setSamples(16);
 
-    FileManager::Instance().loadCustomMap(":/game.txt");
-
-    MyTcpServer* tcpServer = new MyTcpServer();
-    tcpServer->start(10000);
+    FileManager::Instance().loadCustomMap("./game.txt");
 
     Camera* cam = new Camera();
+
+    MyTcpServer* tcpServer = new MyTcpServer(cam);
+    tcpServer->start(10000);
 
     GameWindow window0(40,cam);
     window0.setFormat(format);

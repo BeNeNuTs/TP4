@@ -105,6 +105,8 @@ void GameObject::openPLY(QString _localPath)
     // extract words
     QStringList lines = content.split("\n");
 
+    file.close();
+
     int ind = 0;
 
     for(int i = 0 ; i < lines.size() ; i++){

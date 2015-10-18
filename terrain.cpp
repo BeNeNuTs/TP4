@@ -1,4 +1,5 @@
 #include "terrain.h"
+#include "gameobject.h"
 
 Terrain::Terrain()
 {
@@ -10,7 +11,7 @@ Terrain::Terrain()
     vertex = new QVector3D[0];
 }
 
-Terrain::Terrain(QString season, color c, int nb_v_w, int nb_v_h, point *p)
+Terrain::Terrain(QString season, color c, int nb_v_w, int nb_v_h, point *p, GameObject* t)
 {
     this->saison = season;
     this->c = c;
@@ -23,9 +24,11 @@ Terrain::Terrain(QString season, color c, int nb_v_w, int nb_v_h, point *p)
         vertex[i].setY(p[i].y);
         vertex[i].setZ(p[i].z);
     }
+
+    tree = t;
 }
 
-Terrain::Terrain(QString season, color c, int nb_v_w, int nb_v_h, QVector3D *v)
+Terrain::Terrain(QString season, color c, int nb_v_w, int nb_v_h, QVector3D *v, GameObject* t)
 {
     this->saison = season;
     this->c = c;
@@ -38,4 +41,6 @@ Terrain::Terrain(QString season, color c, int nb_v_w, int nb_v_h, QVector3D *v)
         vertex[i].setY(v[i].y());
         vertex[i].setZ(v[i].z());
     }
+
+    tree = t;
 }
