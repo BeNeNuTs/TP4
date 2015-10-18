@@ -112,20 +112,11 @@ void GameWindow::initialize()
             p[i].z = T->vertex[i].z();
         }
 
-        tree = new GameObject*[FileManager::NB_TERRAIN];
-        tree[Saison::PRINTEMPS] = new GameObject(T->tree->position, T->tree->rotation, T->tree->scale, ":/springtree.ply");
-        tree[Saison::ETE] = new GameObject(T->tree->position, T->tree->rotation, T->tree->scale, ":/summertree.ply");
-        tree[Saison::AUTOMNE] = new GameObject(T->tree->position, T->tree->rotation, T->tree->scale, ":/autumntree.ply");
-        tree[Saison::HIVER] = new GameObject(T->tree->position, T->tree->rotation, T->tree->scale, ":/wintertree.ply");
-
+        initTrees(T->tree);
+        updateTitle();
     }else{
-        tree = new GameObject*[FileManager::NB_TERRAIN];
-        tree[Saison::PRINTEMPS] = new GameObject(QVector3D(0.f,0.f,0.f), QVector3D(0.f,0.f,0.f), QVector3D(0.1f,0.1f,0.1f), ":/springtree.ply");
-        tree[Saison::ETE] = new GameObject(QVector3D(0.f,0.f,0.f), QVector3D(0.f,0.f,0.f), QVector3D(0.1f,0.1f,0.1f), ":/summertree.ply");
-        tree[Saison::AUTOMNE] = new GameObject(QVector3D(0.f,0.f,0.f), QVector3D(0.f,0.f,0.f), QVector3D(0.1f,0.1f,0.1f), ":/autumntree.ply");
-        tree[Saison::HIVER] = new GameObject(QVector3D(0.f,0.f,0.f), QVector3D(0.f,0.f,0.f), QVector3D(0.1f,0.1f,0.1f), ":/wintertree.ply");
-
         loadMap(":/heightmap-2.png");
+        initTrees();
     }
 
     createParticles();
@@ -703,7 +694,9 @@ void GameWindow::displayTree(){
         return;
     }
 
-    tree[saison]->display();
+    for(unsigned int i = 0 ; i < NB_ARBRES ; i++){
+        tree[saison][i]->display();
+    }
 }
 
 /**
@@ -730,11 +723,11 @@ void GameWindow::doConnect(){
 }
 
 void GameWindow::save(){
-    Terrain* T = new Terrain(season, seasonColor(), nb_vertex_width, nb_vertex_height, p, tree[saison]);
+    Terrain* T = new Terrain(season, seasonColor(), nb_vertex_width, nb_vertex_height, p, tree);
     FileManager::Instance().saveCustomMap(T);
 }
 
-GameWindow::updateEnumSaison()
+void GameWindow::updateEnumSaison()
 {
     if(season == "PRINTEMPS"){
         saison = Saison::PRINTEMPS;
@@ -744,6 +737,53 @@ GameWindow::updateEnumSaison()
         saison = Saison::AUTOMNE;
     }else if(season == "HIVER"){
         saison = Saison::HIVER;
+    }
+}
+
+void GameWindow::initTrees()
+{
+    tree = new GameObject**[FileManager::NB_TERRAIN];
+    tree[Saison::PRINTEMPS] = new GameObject*[NB_ARBRES];
+    tree[Saison::ETE] = new GameObject*[NB_ARBRES];
+    tree[Saison::AUTOMNE] = new GameObject*[NB_ARBRES];
+    tree[Saison::HIVER] = new GameObject*[NB_ARBRES];
+
+    for(unsigned int j = 0 ; j < FileManager::NB_TERRAIN ; j++){
+        for(unsigned int i = 0 ; i < NB_ARBRES ; i++){
+            QVector3D pos;
+
+            int rand_x, rand_y, id;
+
+            rand_x = rand() % nb_vertex_width;
+            rand_y = rand() % nb_vertex_height;
+            id = rand_y * nb_vertex_width + rand_x;
+
+            pos.setX(p[id].x); pos.setY(p[id].y); pos.setZ(p[id].z);
+
+            if(j == Saison::PRINTEMPS){
+                tree[j][i] = new GameObject(pos, QVector3D(0.f,0.f,0.f), QVector3D(0.1f,0.1f,0.1f), ":/springtree.ply");
+            }else if(j == Saison::ETE){
+                tree[j][i] = new GameObject(pos, QVector3D(0.f,0.f,0.f), QVector3D(0.1f,0.1f,0.1f), ":/summertree.ply");
+            }else if(j == Saison::AUTOMNE){
+                tree[j][i] = new GameObject(pos, QVector3D(0.f,0.f,0.f), QVector3D(0.1f,0.1f,0.1f), ":/autumntree.ply");
+            }else if(j == Saison::HIVER){
+                tree[j][i] = new GameObject(pos, QVector3D(0.f,0.f,0.f), QVector3D(0.1f,0.1f,0.1f), ":/wintertree.ply");
+            }
+        }
+    }
+}
+
+void GameWindow::initTrees(GameObject ***t)
+{
+    tree = new GameObject**[FileManager::NB_TERRAIN];
+
+    for(unsigned int j = 0 ; j < FileManager::NB_TERRAIN ; j++){
+        tree[j] = new GameObject*[NB_ARBRES];
+
+        for(unsigned int i = 0 ; i < NB_ARBRES ; i++){
+            tree[j][i] = t[j][i];
+            tree[j][i]->open(tree[j][i]->localPath);
+        }
     }
 }
 

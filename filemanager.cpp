@@ -52,10 +52,16 @@ void FileManager::saveCustomMap(Terrain* T)
         out << T->vertex[i].x() << T->vertex[i].y() << T->vertex[i].z();
     }
 
-    out << T->tree->localPath;
-    out << T->tree->position.x() << T->tree->position.y() << T->tree->position.z();
-    out << T->tree->rotation.x() << T->tree->rotation.y() << T->tree->rotation.z();
-    out << T->tree->scale.x() << T->tree->scale.y() << T->tree->scale.z();
+    out << FileManager::NB_TERRAIN << GameWindow::NB_ARBRES;
+
+    for(unsigned int j = 0 ; j < NB_TERRAIN ; j++){
+        for(unsigned int i = 0 ; i < GameWindow::NB_ARBRES ; i++){
+            out << T->tree[j][i]->localPath;
+            out << T->tree[j][i]->position.x() << T->tree[j][i]->position.y() << T->tree[j][i]->position.z();
+            out << T->tree[j][i]->rotation.x() << T->tree[j][i]->rotation.y() << T->tree[j][i]->rotation.z();
+            out << T->tree[j][i]->scale.x() << T->tree[j][i]->scale.y() << T->tree[j][i]->scale.z();
+        }
+    }
 
     file.flush();
     file.close();
@@ -87,7 +93,7 @@ void FileManager::loadCustomMap(QString _localPath)
     int nb_vertex_h;
     QVector3D* vertex;
 
-    GameObject* tree;
+    GameObject*** tree;
 
     camera = new Camera();
     in >> camera->etat >> camera->rotX >> camera->rotY >> camera->ss;
@@ -106,25 +112,41 @@ void FileManager::loadCustomMap(QString _localPath)
             vertex[i].setY(y);
             vertex[i].setZ(z);
         }
-        tree = new GameObject();
+        int nb_terrains, nb_arbres;
+        in >> nb_terrains >> nb_arbres;
+
+        tree = new GameObject**[nb_terrains];
+        QString localPathTree;
+        QVector3D position;
+        QVector3D rotation;
+        QVector3D scale;
         float x,y,z;
 
-        in >> tree->localPath;
+        for(int j = 0 ; j < nb_terrains ; j++){
+            tree[j] = new GameObject*[nb_arbres];
 
-        in >> x >> y >> z;
-        tree->position.setX(x);
-        tree->position.setY(y);
-        tree->position.setZ(z);
+            for(int i = 0 ; i < nb_arbres ; i++){
 
-        in >> x >> y >> z;
-        tree->rotation.setX(x);
-        tree->rotation.setY(y);
-        tree->rotation.setZ(z);
+                in >> localPathTree;
 
-        in >> x >> y >> z;
-        tree->scale.setX(x);
-        tree->scale.setY(y);
-        tree->scale.setZ(z);
+                in >> x >> y >> z;
+                position.setX(x);
+                position.setY(y);
+                position.setZ(z);
+
+                in >> x >> y >> z;
+                rotation.setX(x);
+                rotation.setY(y);
+                rotation.setZ(z);
+
+                in >> x >> y >> z;
+                scale.setX(x);
+                scale.setY(y);
+                scale.setZ(z);
+
+                tree[j][i] = new GameObject(position, rotation, scale, localPathTree);
+            }
+        }
 
         T[t] = new Terrain(saison, c, nb_vertex_w, nb_vertex_h, vertex, tree);
     }

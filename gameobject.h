@@ -5,7 +5,7 @@
 #include <QString>
 #include <QFile>
 
-enum Format { PLY };
+enum Format { PLY, STL };
 
 class GameObject
 {
@@ -19,6 +19,11 @@ public:
 
 private:
     void openPLY(QString localPath);
+    void openSTL(QString localPath);
+
+    void displayPLY();
+    void displaySTL();
+
 
 
 public:

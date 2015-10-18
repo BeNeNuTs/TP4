@@ -16,9 +16,6 @@ struct particles
     float min_z;
 };
 
-enum Saison { PRINTEMPS = 0, ETE = 1, AUTOMNE = 2, HIVER = 3, NONE = 4};
-
-
 class GameWindow : public OpenGLWindow
 {
 signals:
@@ -65,10 +62,13 @@ public:
     void save();
 
 private:
-    updateEnumSaison();
+    void updateEnumSaison();
+    void initTrees();
+    void initTrees(GameObject*** t);
 
 public:
     static const unsigned int MAX_PARTICLES = 1000;
+    static const unsigned int NB_ARBRES = 3;
 
 private:
 
@@ -94,7 +94,7 @@ private:
 
     particles* tab_particles;   // Tableau contenant les particules de pluie/neige
 
-    GameObject** tree;
+    GameObject*** tree;
 };
 
 

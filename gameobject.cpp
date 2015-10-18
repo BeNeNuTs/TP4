@@ -3,7 +3,11 @@
 #include <QtGui/QMatrix4x4>
 #include <QtGui/QOpenGLShaderProgram>
 
+#include <vector>
+
 #include "gameobject.h"
+
+using namespace std;
 
 GameObject::GameObject()
 {
@@ -52,9 +56,14 @@ void GameObject::open(QString _localPath)
         return;
     }
 
+
+
     if(file.readLine() == "ply\n"){
         file.close();
         openPLY(_localPath);
+    }else if(file.readLine() == "solid\n"){
+        file.close();
+        openSTL(_localPath);
     }
 
 }
@@ -71,19 +80,11 @@ void GameObject::display()
 
     glColor3f(0.f,0.5f,0.f);
 
-    glBegin(GL_TRIANGLES);
-    for(int i = 0 ; i < nb_ind ; i++){
-        glNormal3f(normals[(int)index[i].x()].x(), normals[(int)index[i].x()].y(), normals[(int)index[i].x()].z());
-        glVertex3f(vertex[(int)index[i].x()].x(), vertex[(int)index[i].x()].y(), vertex[(int)index[i].x()].z());
-
-        glNormal3f(normals[(int)index[i].y()].x(), normals[(int)index[i].y()].y(), normals[(int)index[i].y()].z());
-        glVertex3f(vertex[(int)index[i].y()].x(), vertex[(int)index[i].y()].y(), vertex[(int)index[i].y()].z());
-
-        glNormal3f(normals[(int)index[i].z()].x(), normals[(int)index[i].z()].y(), normals[(int)index[i].z()].z());
-        glVertex3f(vertex[(int)index[i].z()].x(), vertex[(int)index[i].z()].y(), vertex[(int)index[i].z()].z());
-
+    if(format == Format::PLY){
+        displayPLY();
+    }else if(format == Format::STL){
+        displaySTL();
     }
-    glEnd();
 
     glPopMatrix();
 }
@@ -154,6 +155,72 @@ void GameObject::openPLY(QString _localPath)
 
         i++;
     }
+
+}
+
+void GameObject::openSTL(QString _localPath)
+{
+    QFile file(_localPath);
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        qDebug() << "Could not open " << _localPath;
+        return;
+    }
+
+    localPath = _localPath;
+    format = Format::STL;
+
+    // read whole content
+    QString content = file.readAll();
+    // extract words
+    QStringList lines = content.split("\n");
+
+    file.close();
+
+    vector<QVector3D> v_normals;
+    vector<QVector3D> v_vertex;
+
+    for(int i = 0 ; i < lines.size() ; i++){
+        if(lines[i].contains("facet normals")){
+            QStringList words = lines[i].split(" ");
+            v_normals.push_back(QVector3D(words[2].toFloat(), words[3].toFloat(), words[4].toFloat()));
+        }else if(lines[i].contains("vertex")){
+            QStringList words = lines[i].split(" ");
+            v_vertex.push_back(QVector3D(words[1].toFloat(), words[2].toFloat(), words[3].toFloat()));
+        }
+    }
+
+    vertex = new QVector3D[v_vertex.size()];
+    normals = new QVector3D[v_normals.size()];
+
+    for(unsigned int i = 0 ; i < v_vertex.size() ; i++){
+        vertex[i] = v_vertex[i];
+    }
+
+    for(unsigned int i = 0 ; i < v_normals.size() ; i++){
+        normals[i] = v_normals[i];
+    }
+}
+
+void GameObject::displayPLY()
+{
+    glBegin(GL_TRIANGLES);
+    for(int i = 0 ; i < nb_ind ; i++){
+        glNormal3f(normals[(int)index[i].x()].x(), normals[(int)index[i].x()].y(), normals[(int)index[i].x()].z());
+        glVertex3f(vertex[(int)index[i].x()].x(), vertex[(int)index[i].x()].y(), vertex[(int)index[i].x()].z());
+
+        glNormal3f(normals[(int)index[i].y()].x(), normals[(int)index[i].y()].y(), normals[(int)index[i].y()].z());
+        glVertex3f(vertex[(int)index[i].y()].x(), vertex[(int)index[i].y()].y(), vertex[(int)index[i].y()].z());
+
+        glNormal3f(normals[(int)index[i].z()].x(), normals[(int)index[i].z()].y(), normals[(int)index[i].z()].z());
+        glVertex3f(vertex[(int)index[i].z()].x(), vertex[(int)index[i].z()].y(), vertex[(int)index[i].z()].z());
+
+    }
+    glEnd();
+}
+
+void GameObject::displaySTL()
+{
 
 }
 

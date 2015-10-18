@@ -70,6 +70,7 @@ void MyTcpServer::sendSeason()
 void MyTcpServer::saveGame()
 {
     qDebug() << "SAVE";
+    saveTimer->stop();
 
     QString localPath = FileManager::Instance().localPath;
     QFile file(localPath);
