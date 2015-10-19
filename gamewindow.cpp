@@ -687,6 +687,9 @@ void GameWindow::displayParticles(){
     glEnd();
 }
 
+/**
+ * @brief GameWindow::displayTree, Affiche les différents arbres sur le terrain.
+ */
 void GameWindow::displayTree(){
     if(saison == Saison::NONE){
         return;
@@ -720,11 +723,17 @@ void GameWindow::doConnect(){
     }
 }
 
+/**
+ * @brief GameWindow::save, envoi le terrain de la fenêtre au FileManager pour le sauvegarder.
+ */
 void GameWindow::save(){
     Terrain* T = new Terrain(season, seasonColor(), nb_vertex_width, nb_vertex_height, p, tree);
     FileManager::Instance().saveCustomMap(T);
 }
 
+/**
+ * @brief GameWindow::updateEnumSaison, met à jour l'enum Saison en fonction de la saison courante.
+ */
 void GameWindow::updateEnumSaison()
 {
     if(season == "PRINTEMPS"){
@@ -738,6 +747,9 @@ void GameWindow::updateEnumSaison()
     }
 }
 
+/**
+ * @brief GameWindow::initTrees, Lorsque le fichier binaire est vide, initialise les arbres des différentes saisons pour la fenêtre.
+ */
 void GameWindow::initTrees()
 {
     tree = new GameObject**[FileManager::NB_TERRAIN];
@@ -771,6 +783,10 @@ void GameWindow::initTrees()
     }
 }
 
+/**
+ * @brief GameWindow::initTrees, Initialise les arbres de la fenêtre en fonction des données contenu dans le fichier binaire.
+ * @param t, tableau de GameObject contenant les différents arbres des différentes saisons
+ */
 void GameWindow::initTrees(GameObject ***t)
 {
     tree = new GameObject**[FileManager::NB_TERRAIN];

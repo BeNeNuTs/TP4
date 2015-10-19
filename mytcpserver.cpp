@@ -3,6 +3,10 @@
 #include <QFile>
 #include <QDataStream>
 
+/**
+ * @brief MyTcpServer::MyTcpServer, Constructeur du TcpServer
+ * @param cam, pointeur vers la caméra (servant pour la sauvegarde)
+ */
 MyTcpServer::MyTcpServer(Camera* cam) : camera(cam)
 {
     server = new QTcpServer(this);
@@ -11,6 +15,10 @@ MyTcpServer::MyTcpServer(Camera* cam) : camera(cam)
     connect(server, SIGNAL(newConnection()), this, SLOT(newConnection()));
 }
 
+/**
+ * @brief MyTcpServer::start, permet de lancer le serveur.
+ * @param timeBetweenSeason, temps entre chaque saison
+ */
 void MyTcpServer::start(int timeBetweenSeason){
     if(!server->listen(QHostAddress::Any, 9999))
     {
@@ -32,6 +40,9 @@ void MyTcpServer::start(int timeBetweenSeason){
     }
 }
 
+/**
+ * @brief MyTcpServer::newConnection, Se déclenche lorsque le serveur reçoit une nouvelle connexion.
+ */
 void MyTcpServer::newConnection()
 {
     // need to grab the socket
@@ -42,6 +53,9 @@ void MyTcpServer::newConnection()
     }
 }
 
+/**
+ * @brief MyTcpServer::sendSeason, envoi une nouvelle saison au fenêtre tout les timeBetweenSaison.
+ */
 void MyTcpServer::sendSeason()
 {
     int tmpSeason = season;
@@ -67,6 +81,9 @@ void MyTcpServer::sendSeason()
         season = 0;
 }
 
+/**
+ * @brief MyTcpServer::saveGame, sauvegarde la position de la caméra dans le fichier et demande aux fenêtres de sauvegarder leur terrain.
+ */
 void MyTcpServer::saveGame()
 {
     qDebug() << "SAVE";

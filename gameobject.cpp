@@ -9,6 +9,9 @@
 
 using namespace std;
 
+/**
+ * @brief GameObject::GameObject, Constructeur d'un GameObject.
+ */
 GameObject::GameObject()
 {
     position = QVector3D(0.f,0.f,0.f);
@@ -23,6 +26,12 @@ GameObject::GameObject()
     index = new QVector3D[nb_ind];
 }
 
+/**
+ * @brief GameObject::GameObject, Constructeur d'un GameObject.
+ * @param pos, position de l'objet
+ * @param rot, rotation de l'objet
+ * @param _scale, échelle de l'objet
+ */
 GameObject::GameObject(QVector3D pos, QVector3D rot, QVector3D _scale)
 {
     position = pos;
@@ -37,6 +46,13 @@ GameObject::GameObject(QVector3D pos, QVector3D rot, QVector3D _scale)
     index = new QVector3D[nb_ind];
 }
 
+/**
+ * @brief GameObject::GameObject, Constructeur d'un GameObject.
+ * @param pos, position de l'objet
+ * @param rot, rotation de l'objet
+ * @param _scale, échelle de l'objet
+ * @param _localPath, chemin de l'objet à charger
+ */
 GameObject::GameObject(QVector3D pos, QVector3D rot, QVector3D _scale, QString _localPath)
 {
     position = pos;
@@ -46,6 +62,10 @@ GameObject::GameObject(QVector3D pos, QVector3D rot, QVector3D _scale, QString _
     open(_localPath);
 }
 
+/**
+ * @brief GameObject::open, permet d'ouvrir l'objet dont le chemin est passé en paramètre.
+ * @param _localPath, chemin de l'objet
+ */
 void GameObject::open(QString _localPath)
 {
 
@@ -71,6 +91,9 @@ void GameObject::open(QString _localPath)
 
 }
 
+/**
+ * @brief GameObject::display, Affiche le GameObject en fonction de son type.
+ */
 void GameObject::display()
 {
     glPushMatrix();
@@ -94,6 +117,10 @@ void GameObject::display()
     glPopMatrix();
 }
 
+/**
+ * @brief GameObject::openPLY, permet d'ouvrir les objets de type PLY.
+ * @param _localPath, chemin de l'objet
+ */
 void GameObject::openPLY(QString _localPath)
 {
     QFile file(_localPath);
@@ -163,6 +190,10 @@ void GameObject::openPLY(QString _localPath)
 
 }
 
+/**
+ * @brief GameObject::openSTL, permet d'ouvrir les objets de type STL.
+ * @param _localPath, chemin de l'objet
+ */
 void GameObject::openSTL(QString _localPath)
 {
     QFile file(_localPath);
@@ -211,6 +242,10 @@ void GameObject::openSTL(QString _localPath)
     }
 }
 
+/**
+ * @brief GameObject::openOBJ, permet d'ouvrir les objets de type OBJ.
+ * @param _localPath, chemin de l'objet
+ */
 void GameObject::openOBJ(QString _localPath)
 {
     QFile file(_localPath);
@@ -262,6 +297,9 @@ void GameObject::openOBJ(QString _localPath)
     }
 }
 
+/**
+ * @brief GameObject::displayPLY, permet d'afficher les objets de type PLY.
+ */
 void GameObject::displayPLY()
 {
     glBegin(GL_TRIANGLES);
@@ -280,6 +318,9 @@ void GameObject::displayPLY()
     glEnd();
 }
 
+/**
+ * @brief GameObject::displaySTL, permet d'afficher les objets de type STL.
+ */
 void GameObject::displaySTL()
 {
     unsigned int j = 0;
@@ -296,6 +337,9 @@ void GameObject::displaySTL()
     glEnd();
 }
 
+/**
+ * @brief GameObject::displayOBJ, permet d'afficher les objets de type OBJ.
+ */
 void GameObject::displayOBJ()
 {
     glBegin(GL_TRIANGLES);

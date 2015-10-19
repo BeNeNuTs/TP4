@@ -11,9 +11,19 @@
 
 using namespace std;
 
+/**
+ * @brief FileManager::m_instance, instance singleton de la classe FileManager.
+ */
 FileManager FileManager::m_instance = FileManager();
+
+/**
+ * @brief FileManager::id, identifiant des différents Terrains chargés.
+ */
 int FileManager::id = 0;
 
+/**
+ * @brief FileManager::FileManager, constructeur FileManager.
+ */
 FileManager::FileManager()
 {
     T = new Terrain*[NB_TERRAIN];
@@ -30,11 +40,19 @@ FileManager::~FileManager()
     cout<<"Destruction"<<endl;
 }
 
+/**
+ * @brief FileManager::Instance, permet d'accéder à l'instance de FileManager.
+ * @return m_instance
+ */
 FileManager& FileManager::Instance()
 {
     return m_instance;
 }
 
+/**
+ * @brief FileManager::saveCustomMap, sauvegarde le Terrain passé en paramètre dans le fichier binaire unique.
+ * @param T, Terrain permettant d'accéder aux différentes informations de celui-ci
+ */
 void FileManager::saveCustomMap(Terrain* T)
 {
     QFile file(localPath);
@@ -67,6 +85,10 @@ void FileManager::saveCustomMap(Terrain* T)
     file.close();
 }
 
+/**
+ * @brief FileManager::loadCustomMap, charge le fichier binaire à partir du chemin passé en paramètre et constitue les différents terrains.
+ * @param _localPath, chemin vers le fichier binaire
+ */
 void FileManager::loadCustomMap(QString _localPath)
 {
     localPath = _localPath;
@@ -154,6 +176,10 @@ void FileManager::loadCustomMap(QString _localPath)
     file.close();
 }
 
+/**
+ * @brief FileManager::getTerrain, permet aux fenêtres de récupèrer le terrain en fonction de l'id courant
+ * @return un Terrain
+ */
 Terrain *FileManager::getTerrain()
 {
     if(FileManager::id > NB_TERRAIN)

@@ -2,6 +2,9 @@
 #include "gameobject.h"
 #include "gamewindow.h"
 
+/**
+ * @brief Terrain::Terrain, Constructeur de terrain.
+ */
 Terrain::Terrain()
 {
     this->saison = "";
@@ -12,6 +15,15 @@ Terrain::Terrain()
     vertex = new QVector3D[0];
 }
 
+/**
+ * @brief Terrain::Terrain, Constructeur de terrain.
+ * @param season, saison courante
+ * @param c, couleur du terrain
+ * @param nb_v_w, nombre de vertex en longueur
+ * @param nb_v_h, nombre de vertex en largeur
+ * @param p, tableau de point
+ * @param t, tableau contenant les différents arbres des différentes saisons
+ */
 Terrain::Terrain(QString season, color c, int nb_v_w, int nb_v_h, point *p, GameObject*** t)
 {
     this->saison = season;
@@ -39,6 +51,15 @@ Terrain::Terrain(QString season, color c, int nb_v_w, int nb_v_h, point *p, Game
     }
 }
 
+/**
+ * @brief Terrain::Terrain, Constructeur de terrain.
+ * @param season, saison courante
+ * @param c, couleur du terrain
+ * @param nb_v_w, nombre de vertex en longueur
+ * @param nb_v_h, nombre de vertex en largeur
+ * @param v, QVector3D de point
+ * @param t, tableau contenant les différents arbres des différentes saisons
+ */
 Terrain::Terrain(QString season, color c, int nb_v_w, int nb_v_h, QVector3D *v, GameObject*** t)
 {
     this->saison = season;
