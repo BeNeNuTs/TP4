@@ -87,15 +87,30 @@ void MyTcpServer::sendSeason()
 void MyTcpServer::saveGame()
 {
     qDebug() << "SAVE";
-    saveTimer->stop();
+    bool exist = false;
 
     QString localPath = FileManager::Instance().localPath;
     QFile file(localPath);
+
+    if(file.exists()){
+        exist = true;
+    }
+
     if(!file.open(QIODevice::ReadWrite))
     {
         qDebug() << "MyTcpServer(saveGame) : Could not open " << localPath;
         return;
     }
+
+    if(exist){
+        QFile::remove("./game_save.txt");
+        QFile save("./game_save.txt");
+        save.open(QIODevice::ReadWrite);
+        QDataStream in(&save);
+        in.setVersion(QDataStream::Qt_5_1);
+        in << file.readAll();
+    }
+
     file.resize(0);
 
     QDataStream out(&file);
