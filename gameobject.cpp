@@ -64,6 +64,9 @@ void GameObject::open(QString _localPath)
     }else if(line.contains("solid")){
         file.close();
         openSTL(_localPath);
+    }else if(line.contains("OBJ")){
+        file.close();
+        openOBJ(_localPath);
     }
 
 }
@@ -84,6 +87,8 @@ void GameObject::display()
         displayPLY();
     }else if(format == Format::STL){
         displaySTL();
+    }else if(format == Format::OBJ){
+        displayOBJ();
     }
 
     glPopMatrix();
@@ -206,9 +211,61 @@ void GameObject::openSTL(QString _localPath)
     }
 }
 
+void GameObject::openOBJ(QString _localPath)
+{
+    QFile file(_localPath);
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        qDebug() << "Could not open " << _localPath;
+        return;
+    }
+
+    localPath = _localPath;
+    format = Format::OBJ;
+
+    // read whole content
+    QString content = file.readAll();
+    // extract words
+    QStringList lines = content.split("\n");
+
+    file.close();
+
+    vector<QVector3D> v_index;
+    vector<QVector3D> v_vertex;
+
+    for(int i = 4 ; i < lines.size() ; i++){
+        if(lines[i].contains("v ")){
+            QStringList words = lines[i].split(" ");
+            v_vertex.push_back(QVector3D(words[1].toFloat(), words[2].toFloat(), words[3].toFloat()));
+        }else if(lines[i].contains("f ")){
+            QStringList words = lines[i].split(" ");
+            v_index.push_back(QVector3D(words[1].toInt(), words[2].toInt(), words[3].toInt()));
+        }
+    }
+
+    nb_vertex = v_vertex.size();
+    nb_ind = v_index.size();
+
+    vertex = new QVector3D[nb_vertex];
+    index = new QVector3D[nb_ind];
+
+    for(int i = 0 ; i < nb_vertex ; i++){
+        vertex[i].setX(v_vertex[i].x());
+        vertex[i].setY(v_vertex[i].y());
+        vertex[i].setZ(v_vertex[i].z());
+    }
+
+    for(int i = 0 ; i < nb_ind ; i++){
+        index[i].setX(v_index[i].x());
+        index[i].setY(v_index[i].y());
+        index[i].setZ(v_index[i].z());
+    }
+}
+
 void GameObject::displayPLY()
 {
     glBegin(GL_TRIANGLES);
+    #pragma omp for schedule(dynamic)
     for(int i = 0 ; i < nb_ind ; i++){
         glNormal3f(normals[(int)index[i].x()].x(), normals[(int)index[i].x()].y(), normals[(int)index[i].x()].z());
         glVertex3f(vertex[(int)index[i].x()].x(), vertex[(int)index[i].x()].y(), vertex[(int)index[i].x()].z());
@@ -228,12 +285,25 @@ void GameObject::displaySTL()
     unsigned int j = 0;
 
     glBegin(GL_TRIANGLES);
+    #pragma omp for schedule(dynamic)
     for(int i = 0 ; i < nb_vertex ; i+=3){
         glNormal3f(normals[j].x(), normals[j].y(), normals[j].z());
         glVertex3f(vertex[i].x(), vertex[i].y(), vertex[i].z());
         glVertex3f(vertex[i+1].x(), vertex[i+1].y(), vertex[i+1].z());
         glVertex3f(vertex[i+2].x(), vertex[i+2].y(), vertex[i+2].z());
         j++;
+    }
+    glEnd();
+}
+
+void GameObject::displayOBJ()
+{
+    glBegin(GL_TRIANGLES);
+    #pragma omp for schedule(dynamic)
+    for(int i = 0 ; i < nb_ind ; i++){
+        glVertex3f(vertex[(int)index[i].x()].x(), vertex[(int)index[i].x()].y(), vertex[(int)index[i].x()].z());
+        glVertex3f(vertex[(int)index[i].y()].x(), vertex[(int)index[i].y()].y(), vertex[(int)index[i].y()].z());
+        glVertex3f(vertex[(int)index[i].z()].x(), vertex[(int)index[i].z()].y(), vertex[(int)index[i].z()].z());
     }
     glEnd();
 }

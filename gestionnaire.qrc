@@ -7,7 +7,7 @@
         <file>heightmap-1.png</file>
         <file>heightmap-2.png</file>
         <file>heightmap-3.png</file>
-        <file>game.txt</file>
-        <file>autumntree.stl</file>
+        <file>summertree.stl</file>
+        <file>springtree.obj</file>
     </qresource>
 </RCC>

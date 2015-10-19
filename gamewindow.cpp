@@ -85,7 +85,7 @@ void GameWindow::initialize()
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 
     //Add ambient light
-    GLfloat ambientColor[] = {0.8f, 0.8f, 0.8f, 1.0f}; //Color(0.2, 0.2, 0.2)
+    GLfloat ambientColor[] = {0.8f, 0.8f, 0.8f, 1.0f};
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientColor);
 
     //Add directionnal light
@@ -288,17 +288,15 @@ void GameWindow::keyPressEvent(QKeyEvent *event)
  */
 void GameWindow::displayPoints()
 {
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glBegin(GL_POINTS);
-
     seasonColor();
+
+    glBegin(GL_POINTS);
 
     uint id = 0;
 
 #pragma omp for schedule(dynamic)
     for(int i = 0; i < nb_vertex_width; i++)
     {
-
         for(int j = 0; j < nb_vertex_height; j++)
         {
             id = i*nb_vertex_width +j;
@@ -765,7 +763,7 @@ void GameWindow::initTrees()
             }else if(j == Saison::ETE){
                 tree[j][i] = new GameObject(pos, QVector3D(0.f,0.f,0.f), QVector3D(0.1f,0.1f,0.1f), ":/summertree.ply");
             }else if(j == Saison::AUTOMNE){
-                tree[j][i] = new GameObject(pos, QVector3D(0.f,0.f,0.f), QVector3D(0.1f,0.1f,0.1f), ":/autumntree.stl");
+                tree[j][i] = new GameObject(pos, QVector3D(0.f,0.f,0.f), QVector3D(0.1f,0.1f,0.1f), ":/autumntree.ply");
             }else if(j == Saison::HIVER){
                 tree[j][i] = new GameObject(pos, QVector3D(0.f,0.f,0.f), QVector3D(0.1f,0.1f,0.1f), ":/wintertree.ply");
             }
