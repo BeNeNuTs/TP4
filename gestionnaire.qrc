@@ -9,5 +9,6 @@
         <file>heightmap-3.png</file>
         <file>summertree.stl</file>
         <file>springtree.obj</file>
+        <file>island_tree.ply</file>
     </qresource>
 </RCC>

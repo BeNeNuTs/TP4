@@ -771,7 +771,7 @@ void GameWindow::initTrees()
             pos.setX(p[id].x); pos.setY(p[id].y); pos.setZ(p[id].z);
 
             if(j == Saison::PRINTEMPS){
-                tree[j][i] = new GameObject(pos, QVector3D(0.f,0.f,0.f), QVector3D(0.1f,0.1f,0.1f), ":/springtree.ply");
+                tree[j][i] = new GameObject(pos, QVector3D(0.f,0.f,0.f), QVector3D(0.1f,0.1f,0.1f), ":/island_tree.ply");
             }else if(j == Saison::ETE){
                 tree[j][i] = new GameObject(pos, QVector3D(0.f,0.f,0.f), QVector3D(0.1f,0.1f,0.1f), ":/summertree.ply");
             }else if(j == Saison::AUTOMNE){
